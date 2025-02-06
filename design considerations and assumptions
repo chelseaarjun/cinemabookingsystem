@@ -1,0 +1,24 @@
+#Design considerations
+1. Objects/Entities -
+    1.1 Seats
+        - seatID: String
+        - isReserved: Boolean
+        - reserveSeats(List<Seat> seats)
+        - getReserverdSeats()
+        - geFreeSeats
+        - getAllSeats()
+        
+    1.2 Ticket 
+        - ticketID: string
+        - seats: array[Seats]
+        - generateNewTicketID()
+
+    1.3 ReservationSystem
+        - reserverTickets(int numSeats)
+        - confirmSeatSelection(array[]: Seats)
+        - checkBooking()
+        - main()
+          
+#Assumptions
+- No two users are using the system as the same time (there will be conflict as they both might get a reservation number with same seats)
+-

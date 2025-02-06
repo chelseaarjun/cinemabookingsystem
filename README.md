@@ -11,6 +11,10 @@ Max seats per row is 50.
 - Maven 3.8+ or Gradle 7+ (if using build tools)
 - Git
 
+git clone https://github.com/chelseaarjun/cinemabookingsystem.git
+
+or uncompress
+
 - Build Process
   - Compile your source code:
 bash

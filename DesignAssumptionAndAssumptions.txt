@@ -21,4 +21,5 @@
           
 #Assumptions
 - No two users are using the system as the same time (there will be conflict as they both might get a reservation number with same seats)
--
+- The system is only making a booking a single movie. So we don't need a movie object to keep track of the movies playing at a theater and their showtimes.
+- Even for the single movie there is no showtimes selection needed. 

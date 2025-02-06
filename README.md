@@ -11,6 +11,17 @@ Max seats per row is 50.
 - Maven 3.8+ or Gradle 7+ (if using build tools)
 - Git
 
+- Build Process
+  - Compile your source code:
+bash
+javac -d classes src/*.java
+Create a JAR file:
+bash
+jar cvfe myapp.jar Main -C classes .
+Check dependencies (optional):
+bash
+jdeps -s myapp.jar
+
 **Docker Setup**
 - Docker Desktop or Docker Engine
 - Git

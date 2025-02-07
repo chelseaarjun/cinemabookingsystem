@@ -1,6 +1,6 @@
-package com.gic.cinema;
+package com.gic.cinema.app;
 
-public class CinemaApplication {
+public class CinemaBookingApp {
     public static void main(String[] args) {
         System.out.println("Hello world!");
     }

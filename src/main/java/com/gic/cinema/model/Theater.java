@@ -33,13 +33,14 @@ import lombok.ToString;
 @Getter
 @ToString
 public class Theater {
-    private final static String SCREEN_ID = "1";
-    private final Map<String, Ticket> tickets;
     private final Screen screen;
+    private final Showtime showtimes;
+    private final Map<String, Ticket> tickets;
     private int ticketCounter;
 
     public Theater(@NonNull String movieName, int rows, int seatsPerRow) {
-        this.screen = new Screen(SCREEN_ID, movieName, rows, seatsPerRow);
+        this.screen = new Screen("Screen-1", rows, seatsPerRow);
+        this.showtimes = new Showtime(movieName, screen);
         this.tickets = new HashMap<>();
         this.ticketCounter = 0;
     }
@@ -49,13 +50,20 @@ public class Theater {
     }
 
     public Ticket confirmSeatSelection(List<Seat> seats) {
+        //generated ticket
+        //reserve seats for showtime
+        //store
         return null;
     }
 
     public Ticket checkBooking(String ticketID) {
+        //lookup by ticketID
+        //get reserved seat numbers
+        //get screen layout
         return null;
     }
 
     public void displaySeatingArrangement() {
+        //call the screen's display layout function
     }
 }

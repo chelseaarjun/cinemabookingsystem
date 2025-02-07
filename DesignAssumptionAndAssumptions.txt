@@ -13,11 +13,27 @@
         - seats: array[Seats]
         - generateNewTicketID()
 
-    1.3 ReservationSystem
+    1.3 Screen
+        - seats
+        - movieName
+
+    1.3 Theater
         - reserverTickets(int numSeats)
         - confirmSeatSelection(array[]: Seats)
         - checkBooking()
-        - main()
+        
+    1.4 CinemaBookingApp
+        - handle taking user input and actual booking
+
+A Movie theather can have many Showtimes and many Screens
+A Screen has a max row and seats per row 
+A Showtime is for a particular movie and shown at a particular Screen which determines the number of seats a showtime can have
+A Ticket is for particular Showtime and specified number of seats.
+
+The primary design choices
+- Separation of concern
+- Flexiblity to extend to support multiple screens in future
+- Flexiblity to extend to support multiple theaters in future
           
 #Assumptions
 - No two users are using the system as the same time (there will be conflict as they both might get a reservation number with same seats)

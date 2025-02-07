@@ -1,6 +1,5 @@
 package com.gic.cinema.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -8,7 +7,7 @@ import lombok.NonNull;
 import lombok.ToString;
 
 /**
- * Represents a movie ticket, encapsulating one or more seats and providing functionality
+ * Represents a movie ticket, encapsulating the screen and seat numbers of a reservation and providing functionality
  * to generate ticket identifiers.
  * <p>
  * The ticket identifier is generated using a fixed prefix "GIC" followed by a four-digit counter.
@@ -19,13 +18,13 @@ import lombok.ToString;
 public class Ticket {
     private final static String TICKET_PREFIX = "GIC"; 
     private final String ticketId;
-    private final String screeId;
-    private final List<Seat> seats;
+    private final Showtime showtimes;
+    private final List<String> seatNumbers;
 
-    public Ticket(@NonNull String ticketId, @NonNull String screeId, @NonNull List<Seat> seats) {
-        this.ticketId = ticketId;
-        this.screeId = screeId;
-        this.seats = new ArrayList<>(seats);
+    private Ticket(@NonNull Showtime showtimes, @NonNull List<String> seatNumbers, int ticketNumber) {
+        this.ticketId = generateTicketID(ticketNumber);
+        this.showtimes = showtimes;
+        this.seatNumbers = seatNumbers;
     }
 
     /**
@@ -33,10 +32,14 @@ public class Ticket {
      * @param counter: 
      * @return 
      */
-    public static String generateTicketID(final int counter){
+    static String generateTicketID(final int counter){
         if (counter > 9999) {
             throw new IllegalStateException("Ticket counter is not expected to be more than 4 digits!!!");
         }
         return String.format("%s%04d", TICKET_PREFIX, counter);
     }
+
+    public static Ticket createTicket(Showtime showtimes, List<String> seatNumbers, int ticketNumber) {
+        return new Ticket(showtimes, seatNumbers, ticketNumber);
+    }   
 }

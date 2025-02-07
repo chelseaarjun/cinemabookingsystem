@@ -7,30 +7,22 @@ import java.util.List;
 import org.junit.Test;
 
 public class TicketTest {
-    private final String screenId = "1";
+    private final Screen screen = new Screen("TestScreen", 2, 4);
+    private final List<String> seatNumbers = List.of("A0", "A1");
+    private final Showtime showtimes = new Showtime("TestMovie", screen);
 
     @Test
     public void ticketIdFormatCorrect() {
-        Ticket ticket = new Ticket(screenId, Ticket.generateTicketID(5), List.of(new Seat(1,1)));
+        Ticket ticket = Ticket.createTicket(showtimes, seatNumbers, 5);
         assertEquals("GIC0005", ticket.getTicketId());
     }
 
     @Test
     public void ticketIdGenerationThrowsException() {
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            new Ticket(screenId, Ticket.generateTicketID(10000), List.of(new Seat(1,1)));
+            Ticket.createTicket(showtimes, seatNumbers, 10000);
         });
         assertEquals("Ticket counter is not expected to be more than 4 digits!!!", exception.getMessage());
-    }
-
-    @Test
-    public void seatAssignmentCorrect() {
-        List<Seat> seats = List.of(new Seat(2,3), new Seat(2,4));
-        Ticket ticket = new Ticket(screenId, Ticket.generateTicketID(1), seats);
-        assertEquals(2, ticket.getSeats().size());
-        assertEquals("B3", ticket.getSeats().get(0).getSeatNumber());
-        assertEquals("B4", ticket.getSeats().get(1).getSeatNumber());
-        assertEquals("GIC0001", ticket.getTicketId());
     }
 }
 

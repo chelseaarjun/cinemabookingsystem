@@ -17,7 +17,7 @@ public class Theather {
     private final List<Seat> allSeats;
     private final Map<String, Ticket> tickets;
     private final String movieName;
-    private int ticketCounter = 0;
+    private int ticketCounter;
 
     public Theather(String movieName, int rows, int seatsPerRow) {
         if (rows > MAX_ROWS || seatsPerRow > MAX_SEATS_PER_ROW) {
@@ -26,6 +26,7 @@ public class Theather {
         this.movieName = movieName;
         this.allSeats = initializeSeats(rows, seatsPerRow);
         this.tickets = new HashMap<>();
+        this.ticketCounter = 0;
     }
     
     private List<Seat> initializeSeats(int rows, int seatsPerRow) {

@@ -10,24 +10,26 @@ public class TicketTest {
 
     @Test
     public void ticketIdFormatCorrect() {
-        Ticket ticket = new Ticket(List.of(new Seat(1,1)));
-        assertEquals("GIC0006", ticket.generateTicketID(5));
+        Ticket ticket = new Ticket(Ticket.generateTicketID(5), List.of(new Seat(1,1)));
+        assertEquals("GIC0005", ticket.getTicketId());
     }
 
     @Test
     public void ticketIdGenerationThrowsException() {
-        Ticket ticket = new Ticket(List.of(new Seat(1,1)));
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> ticket.generateTicketID(10000));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            new Ticket(Ticket.generateTicketID(10000), List.of(new Seat(1,1)));
+        });
         assertEquals("Ticket counter is not expected to be more than 4 digits!!!", exception.getMessage());
     }
 
     @Test
     public void seatAssignmentCorrect() {
         List<Seat> seats = List.of(new Seat(2,3), new Seat(2,4));
-        Ticket ticket = new Ticket(seats);
+        Ticket ticket = new Ticket(Ticket.generateTicketID(1), seats);
         assertEquals(2, ticket.getSeats().size());
         assertEquals("B3", ticket.getSeats().get(0).getSeatNumber());
         assertEquals("B4", ticket.getSeats().get(1).getSeatNumber());
+        assertEquals("GIC0001", ticket.getTicketId());
     }
 }
 

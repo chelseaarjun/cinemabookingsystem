@@ -19,10 +19,12 @@ import lombok.ToString;
 public class Ticket {
     private final static String TICKET_PREFIX = "GIC"; 
     private final String ticketId;
+    private final String screeId;
     private final List<Seat> seats;
 
-    public Ticket(@NonNull String ticketId, @NonNull List<Seat> seats) {
+    public Ticket(@NonNull String ticketId, @NonNull String screeId, @NonNull List<Seat> seats) {
         this.ticketId = ticketId;
+        this.screeId = screeId;
         this.seats = new ArrayList<>(seats);
     }
 

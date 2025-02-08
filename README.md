@@ -33,6 +33,9 @@ git clone https://github.com/chelseaarjun/cinemabookingsystem.git
 
 or uncompress
 
+## Directory Structure
+
+
 ## Build
 - Build Process
   - Compile your source code:

@@ -39,10 +39,34 @@ public class Theater {
         this.tickets = new HashMap<>();
     }
     
-    public Optional<Ticket> getBookedTicket(String ticketId) {
-        return Optional.of(tickets.get(ticketId));
+    /**
+     * Retrieves a booked ticket by its ticket ID.
+     * <p>
+     * Note: This implementation uses {@code Optional.of} on the value found in the tickets map.
+     * </p>
+     *
+     * @param ticketId the identifier of the ticket
+     * @return an Optional containing the Ticket if found, otherwise an empty Optional
+     */
+    public Optional<Ticket> getBookedTicket(@NonNull String ticketId) {
+        if(tickets.containsKey(ticketId)) {
+            return Optional.of(tickets.get(ticketId));
+        }
+        return Optional.empty();
     }
 
+    /**
+     * Generates a new ticket with selected seats.
+     * <p>
+     * A new Ticket is created using the current showtime, the selected seats,
+     * and a ticket number derived from the number of tickets already issued.
+     * The ticket is then stored in the theater’s tickets map and the selected
+     * seats are reserved via the showtime.
+     * </p>
+     *
+     * @param selectedSeats a set of seat identifiers (e.g., "A1", "B12") to be booked
+     * @return the newly generated Ticket 
+     */
     public Ticket generateTicket(Set<String> selectedSeats) {
         Ticket newTicket = new Ticket(showtime, selectedSeats, tickets.size() + 1);
         tickets.put(newTicket.getTicketId(), newTicket);

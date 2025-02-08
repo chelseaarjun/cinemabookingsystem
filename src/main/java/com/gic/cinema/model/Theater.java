@@ -1,9 +1,9 @@
 package com.gic.cinema.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -25,45 +25,28 @@ import lombok.ToString;
  *   <li>The movie name must not be null.</li>
  * </ul>
  * </p>
- *
- * @version 1.0
- * @see Seat
- * @see Ticket
  */
 @Getter
 @ToString
 public class Theater {
     private final Screen screen;
-    private final Showtime showtimes;
+    private final Showtime showtime;
     private final Map<String, Ticket> tickets;
-    private int ticketCounter;
 
     public Theater(@NonNull String movieName, int rows, int seatsPerRow) {
-        this.screen = new Screen("Screen-1", rows, seatsPerRow);
-        this.showtimes = new Showtime(movieName, screen);
+        this.screen = new Screen(rows, seatsPerRow);
+        this.showtime = new Showtime(movieName, screen);
         this.tickets = new HashMap<>();
-        this.ticketCounter = 0;
     }
     
-    public List<Seat> getFreeSeats(int numSeats) {
-        return new ArrayList<Seat>();
+    public Optional<Ticket> getBookedTicket(String ticketId) {
+        return Optional.of(tickets.get(ticketId));
     }
 
-    public Ticket confirmSeatSelection(List<Seat> seats) {
-        //generated ticket
-        //reserve seats for showtime
-        //store
-        return null;
-    }
-
-    public Ticket checkBooking(String ticketID) {
-        //lookup by ticketID
-        //get reserved seat numbers
-        //get screen layout
-        return null;
-    }
-
-    public void displaySeatingArrangement() {
-        //call the screen's display layout function
+    public Ticket generateTicket(Set<String> selectedSeats) {
+        Ticket newTicket = new Ticket(showtime, selectedSeats, tickets.size() + 1);
+        tickets.put(newTicket.getTicketId(), newTicket);
+        showtime.reserveSeats(selectedSeats);
+        return newTicket;
     }
 }

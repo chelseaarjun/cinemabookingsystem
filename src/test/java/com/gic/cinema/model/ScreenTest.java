@@ -12,7 +12,7 @@ public class ScreenTest {
     @Test
     public void testInvalidRowsExceedMax() {
         Exception exception = assertThrows(IllegalArgumentException.class,
-            () -> new Screen("1", 27, 10));
+            () -> new Screen(27, 10));
             
         assertTrue(exception.getMessage().contains("maximum number of rows allowed is 26"));
     }
@@ -23,7 +23,7 @@ public class ScreenTest {
     @Test
     public void testInvalidSeatsPerRowExceedMax() {
         Exception exception = assertThrows(IllegalArgumentException.class,
-            () -> new Screen("1", 10, 51));
+            () -> new Screen(10, 51));
             
         assertTrue(exception.getMessage().contains("maximum number of seats allowed per row allowed is 50"));
     }
@@ -34,7 +34,7 @@ public class ScreenTest {
     @Test
     public void testInvalidRowsNegative() {
         Exception exception = assertThrows(IllegalArgumentException.class,
-            () -> new Screen("1", -1, 1));
+            () -> new Screen(-1, 1));
             
         assertTrue(exception.getMessage().contains("Values between 1 and 26 is expected for rows"));
     }
@@ -45,7 +45,7 @@ public class ScreenTest {
     @Test
     public void testInvalidRowsZero() {
         Exception exception = assertThrows(IllegalArgumentException.class,
-            () -> new Screen("1", 0, 1));
+            () -> new Screen(0, 1));
             
         assertTrue(exception.getMessage().contains("Values between 1 and 26 is expected for rows"));
     }
@@ -56,7 +56,7 @@ public class ScreenTest {
     @Test
     public void testInvalidSeatsPerRowNegative() {
         Exception exception = assertThrows(IllegalArgumentException.class,
-            () -> new Screen("1", 10, -1));
+            () -> new Screen(10, -1));
             
         assertTrue(exception.getMessage().contains("values between 1 and 50 expected for seat per row"));
     }
@@ -67,7 +67,7 @@ public class ScreenTest {
     @Test
     public void testInvalidSeatsPerRowZero() {
         Exception exception = assertThrows(IllegalArgumentException.class,
-            () -> new Screen("1", 10, 0));
+            () -> new Screen(10, 0));
             
         assertTrue(exception.getMessage().contains("values between 1 and 50 expected for seat per row"));
     }

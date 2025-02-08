@@ -1,6 +1,6 @@
 package com.gic.cinema.model;
 
-import java.util.List;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -18,13 +18,13 @@ import lombok.ToString;
 public class Ticket {
     private final static String TICKET_PREFIX = "GIC"; 
     private final String ticketId;
-    private final Showtime showtimes;
-    private final List<String> seatNumbers;
+    private final Showtime showtime;
+    private final Set<String> reservedSeatIds;
 
-    private Ticket(@NonNull Showtime showtimes, @NonNull List<String> seatNumbers, int ticketNumber) {
-        this.ticketId = generateTicketID(ticketNumber);
-        this.showtimes = showtimes;
-        this.seatNumbers = seatNumbers;
+    Ticket(@NonNull Showtime showtime, @NonNull Set<String> reservedSeatIds, int ticketCounter) {
+        this.ticketId = generateTicketID(ticketCounter);
+        this.showtime = showtime;
+        this.reservedSeatIds = reservedSeatIds;
     }
 
     /**
@@ -32,14 +32,10 @@ public class Ticket {
      * @param counter: 
      * @return 
      */
-    static String generateTicketID(final int counter){
-        if (counter > 9999) {
+    private String generateTicketID(int ticketCounter){
+        if (ticketCounter > 9999) {
             throw new IllegalStateException("Ticket counter is not expected to be more than 4 digits!!!");
         }
-        return String.format("%s%04d", TICKET_PREFIX, counter);
+        return String.format("%s%04d", TICKET_PREFIX, ticketCounter);
     }
-
-    public static Ticket createTicket(Showtime showtimes, List<String> seatNumbers, int ticketNumber) {
-        return new Ticket(showtimes, seatNumbers, ticketNumber);
-    }   
 }

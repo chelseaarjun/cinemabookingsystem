@@ -12,7 +12,7 @@ import org.junit.Test;
 public class TheaterTest {
 
     /**
-     * Tests that a ticket is generated properly and can be retrieved using its ticket ID.
+     * Tests that a ticket can be retrieved using its ticket ID.
      */
     @Test
     public void testGenerateAndRetrieveTicket() {
@@ -21,12 +21,34 @@ public class TheaterTest {
         Seat a2 = Seat.createUnReservedSeat(1, 2);
         Set<Seat> selectedSeats = Set.of(a1, a2);
 
-        Ticket ticket = theater.generateTicket(selectedSeats);
-        assertNotNull("Generated ticket should not be null", ticket);
+        String ticketId = theater.generateTicketID();
+        assertNotNull("Generated ticket should not be null", ticketId);
 
-        Optional<Ticket> retrievedTicket = theater.getBookedTicket(ticket.getTicketId());
+        theater.confirmTicket(ticketId, selectedSeats);
+        Optional<Ticket> retrievedTicket = theater.getBookedTicket(ticketId);
         assertTrue( "Ticket should be present in the booked tickets map", retrievedTicket.isPresent());
-        assertEquals("Retrieved ticket should match the generated ticket", retrievedTicket.get(), ticket);
+        assertEquals("Retrieved ticket should match the generated ticket", retrievedTicket.get().getTicketId(), "GIC0001");
+    }
+
+    /**
+     * Tests that a ticket id is generated properly.
+     */
+    @Test
+    public void testTicketIDGeneration() {
+        Theater theater = new Theater("Inception", 5, 10);
+        Seat a1 = Seat.createUnReservedSeat(1, 1);
+        Seat a2 = Seat.createUnReservedSeat(1, 2);
+
+        theater.confirmTicket(theater.generateTicketID(), Set.of(a1));
+        theater.confirmTicket(theater.generateTicketID(), Set.of(a2));
+
+        Optional<Ticket> ticket1 = theater.getBookedTicket("GIC0001");
+        assertTrue( "Ticket should be present in the booked tickets map", ticket1.isPresent());
+        assertEquals("Retrieved ticket should match the generated ticket", ticket1.get().getTicketId(), "GIC0001");
+
+        Optional<Ticket> ticket2 = theater.getBookedTicket("GIC0002");
+        assertTrue( "Ticket should be present in the booked tickets map", ticket2.isPresent());
+        assertEquals("Retrieved ticket should match the generated ticket", ticket2.get().getTicketId(), "GIC0002");
     }
 
     /**

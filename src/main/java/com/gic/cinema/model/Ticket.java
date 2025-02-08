@@ -22,13 +22,13 @@ public class Ticket {
     private final static String TICKET_PREFIX = "GIC"; 
     private final String ticketId;
     private final Showtime showtime;
-    private final Set<Seat> reservedSeatIds;
+    private final Set<Seat> reservedSeats;
 
-    Ticket(@NonNull Showtime showtime, @NonNull Set<Seat> reservedSeatIds, int ticketCounter) {
-        this.ticketId = generateTicketID(ticketCounter);
+    Ticket(@NonNull String ticketId, @NonNull Showtime showtime, @NonNull Set<Seat> reservedSeats) {
+        this.ticketId = ticketId;
         this.showtime = showtime;
-        this.reservedSeatIds = reservedSeatIds;
-        checkSeatsReserved(reservedSeatIds);
+        this.reservedSeats = reservedSeats;
+        checkSeatsReserved(reservedSeats);
     }
 
     /**
@@ -53,7 +53,7 @@ public class Ticket {
      * @param counter: 
      * @return 
      */
-    private String generateTicketID(int ticketCounter){
+    static String generateTicketID(int ticketCounter){
         if (ticketCounter > 9999) {
             throw new IllegalStateException("Ticket counter is not expected to be more than 4 digits!!!");
         }

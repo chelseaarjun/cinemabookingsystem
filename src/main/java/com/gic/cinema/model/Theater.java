@@ -58,7 +58,7 @@ public class Theater {
     }
 
     /**
-     * Generates a new ticket with selected seats.
+     * Generates a new ticket ID.
      * <p>
      * A new Ticket is created using the current showtime, the selected seats,
      * and a ticket number derived from the number of tickets already issued.
@@ -69,10 +69,24 @@ public class Theater {
      * @param selectedSeats a set of seat identifiers (e.g., "A1", "B12") to be booked
      * @return the newly generated Ticket 
      */
-    public Ticket generateTicket(Set<Seat> selectedSeats) {
-        Set<Seat> reservedSeats = showtime.reserveSeats(selectedSeats);
-        Ticket newTicket = new Ticket(showtime, reservedSeats, tickets.size() + 1);
-        tickets.put(newTicket.getTicketId(), newTicket);
-        return newTicket;
+    public String generateTicketID() {
+        return Ticket.generateTicketID(tickets.size() + 1);
+    }
+
+
+    /**
+     * Generates a new ticket with selected seats.
+     * <p>
+     * Given ticketId is confirm for the showtime and the selected seats.
+     * The ticket is then stored in the theater’s tickets map
+     * </p>
+     *
+     * @param selectedSeats a set of seat identifiers (e.g., "A1", "B12") to be booked
+     * @return the newly generated Ticket 
+     */
+    public void confirmTicket(String ticketID, Set<Seat> selectedSeats) {
+        Set<Seat> reservedSeats = this.showtime.reserveSeats(selectedSeats);
+        Ticket ticket = new Ticket(ticketID, this.showtime, reservedSeats);
+        tickets.put(ticket.getTicketId(), ticket);
     }
 }

@@ -67,20 +67,17 @@ public class Showtime {
      * @return the set of reserved seats
      * @throws IllegalArgumentException if any of the seat identifiers are invalid
      */
-    public Set<Seat> reserveSeats(Set<Seat> selectedSeats) {
-        Set<Seat> reserveSeats = new HashSet<>();
+    Set<Seat> reserveSeats(Set<Seat> selectedSeats) {
         selectedSeats.forEach(seat -> {
-            String seatNumber = seat.getSeatNumber();
-            Seat reservedSeat = seats.get(seatNumber).reserve();
-            seats.put(seatNumber, reservedSeat);
-            reserveSeats.add(reservedSeat);
+            Seat reservedSeat = seat.reserve();
+            seats.put(seat.getSeatNumber(), reservedSeat);
         });
-        return reserveSeats;
+        return getReservedSeats();
     }
 
      /**
      * Check if the specified seat identifier is reserved.
-     * @param selectedSeats seat identifier 
+     * @param seat seat identifier 
      * @return true if the seat is reserved, false otherwise
      * @throws IllegalArgumentException if the seat identifier is invalid
      */

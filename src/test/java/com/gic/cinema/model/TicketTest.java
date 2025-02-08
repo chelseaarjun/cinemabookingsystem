@@ -16,12 +16,8 @@ public class TicketTest {
      */
     @Test
     public void ticketIdFormatCorrect() {
-        Seat a1 = Seat.createUnReservedSeat(1, 1);
-        Seat b1 = Seat.createUnReservedSeat(2, 1);
-        Set<Seat> seats = Set.of(a1, b1);
-        Set<Seat> reservedSeats = showtimes.reserveSeats(seats);
-        Ticket ticket = new Ticket(showtimes, reservedSeats, 5);
-        assertEquals("GIC0005", ticket.getTicketId());
+        String ticketid = Ticket.generateTicketID(5);
+        assertEquals("GIC0005", ticketid);
     }
 
      /**
@@ -34,16 +30,15 @@ public class TicketTest {
         Set<Seat> unReservedSeats = Set.of(a1, b1);
       
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            new Ticket(showtimes, unReservedSeats, 5);
+            new Ticket("GIC0001", showtimes, unReservedSeats);
         });
         assertEquals("Cannot create a ticket with unreserved seats", exception.getMessage());
     }
 
-
     @Test
     public void ticketIdGenerationThrowsException() {
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            new Ticket(showtimes, Set.of(), 10000);
+            Ticket.generateTicketID(10000);
         });
         assertEquals("Ticket counter is not expected to be more than 4 digits!!!", exception.getMessage());
     }

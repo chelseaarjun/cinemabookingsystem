@@ -40,17 +40,19 @@ cinemabookingsystem/
 │   ├── main/
 │   │   ├── java/
 │           ├── com.gic.cinema.model/
-│           ├── com.gic.cinema.service/
+│           ├── com.gic.cinema.controller/
+            |-- com.gic.cinema.view/
 │           ├── com.gic.cinema.app/ 
 │   └── test/
 │       ├── java/
 │           ├── com.gic.cinema.model/
-│           ├── com.gic.cinema.service/
+│           ├── com.gic.cinema.controller/
+            |-- com.gic.cinema.view/
 │           ├── com.gic.cinema.app/
 ├── pom.xml
 └── README.md
 
-main folder contains source code organized under models (Entities), service (business logic), app(UI interaction). The unit tests are under the test folder.
+main folder contains source code organized under models (Entities), contorllers (business logic), view(UI). The unit tests are under the test folder.
 
 ## Build
 - Build Process

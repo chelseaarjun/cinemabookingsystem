@@ -57,7 +57,7 @@ public class Seat {
      * 
      * @see #Seat(int, int, boolean)
     */
-    static Seat createUnReservedSeat(int row, int number) {
+    public static Seat createUnReservedSeat(int row, int number) {
         return new Seat(row, number, false);
     }
 

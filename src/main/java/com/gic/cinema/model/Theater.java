@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -27,6 +28,7 @@ import lombok.ToString;
  * </p>
  */
 @Getter
+@EqualsAndHashCode
 @ToString
 public class Theater {
     private final Screen screen;
@@ -67,10 +69,10 @@ public class Theater {
      * @param selectedSeats a set of seat identifiers (e.g., "A1", "B12") to be booked
      * @return the newly generated Ticket 
      */
-    public Ticket generateTicket(Set<String> selectedSeats) {
-        Ticket newTicket = new Ticket(showtime, selectedSeats, tickets.size() + 1);
+    public Ticket generateTicket(Set<Seat> selectedSeats) {
+        Set<Seat> reservedSeats = showtime.reserveSeats(selectedSeats);
+        Ticket newTicket = new Ticket(showtime, reservedSeats, tickets.size() + 1);
         tickets.put(newTicket.getTicketId(), newTicket);
-        showtime.reserveSeats(selectedSeats);
         return newTicket;
     }
 }

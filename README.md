@@ -2,13 +2,14 @@
 A Java basedd Cineam booking System that takes in a movie title. number of rows and number of seats rows as input and allows booking tickets for the movie as well as checking the s
 
 ## Entities
-- A Movie theather can have many Showtimes and many Screens
+- A Movie theater can have many Showtimes and many Screens
 - A Screen has a max row and seats per row 
 - A Showtime is for a particular movie and shown at a particular Screen which determines the number of seats a showtime can have
 - A Ticket is for particular Showtime and specified number of seats.
+- A Seat has row and a
 
 ## Design Consideration
-- Separation of concern, abstraction, encapsultion and immutability
+- Separation of concern, Single Responsibility Principle, Abstraction, Encapsultion and Immutability
 - Flexiblity to extend to support multiple screens, showtimes and theaters in future- 
 - Flexiblity to support new seat selection logic in future
 
@@ -34,7 +35,22 @@ git clone https://github.com/chelseaarjun/cinemabookingsystem.git
 or uncompress
 
 ## Directory Structure
+cinemabookingsystem/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│           ├── com.gic.cinema.model/
+│           ├── com.gic.cinema.service/
+│           ├── com.gic.cinema.app/ 
+│   └── test/
+│       ├── java/
+│           ├── com.gic.cinema.model/
+│           ├── com.gic.cinema.service/
+│           ├── com.gic.cinema.app/
+├── pom.xml
+└── README.md
 
+main folder contains source code organized under models (Entities), service (business logic), app(UI interaction). The unit tests are under the test folder.
 
 ## Build
 - Build Process

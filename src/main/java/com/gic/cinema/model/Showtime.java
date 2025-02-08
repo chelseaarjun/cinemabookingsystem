@@ -1,10 +1,12 @@
 package com.gic.cinema.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
  
@@ -17,6 +19,7 @@ import lombok.ToString;
  * </p>
  */
 @Getter
+@EqualsAndHashCode
 @ToString
 public class Showtime {
     private final String movieName;
@@ -52,25 +55,27 @@ public class Showtime {
      * Get the set of reserved seat identifiers for this showtime.
      * @return
      */
-    public Set<String> getReservedSeats() {
+    public Set<Seat> getReservedSeats() {
         return  seats.values().stream()
             .filter(s -> s.isReserved())
-            .map(s -> s.getSeatNumber())
             .collect(Collectors.toSet());
     }
 
     /**
      * Mark the specified seat identifiers as reserved.
      * @param selectedSeats set of selected seat identifiers for booking
+     * @return the set of reserved seats
      * @throws IllegalArgumentException if any of the seat identifiers are invalid
      */
-    public void reserveSeats(Set<String> selectedSeats) {
-        selectedSeats.forEach(seatNumber -> {
-            if (!seats.containsKey(seatNumber)) {
-                throw new IllegalArgumentException("Seat number " + seatNumber + " is not valid for this screen");
-            }
-            seats.put(seatNumber,  seats.get(seatNumber).reserve());
+    public Set<Seat> reserveSeats(Set<Seat> selectedSeats) {
+        Set<Seat> reserveSeats = new HashSet<>();
+        selectedSeats.forEach(seat -> {
+            String seatNumber = seat.getSeatNumber();
+            Seat reservedSeat = seats.get(seatNumber).reserve();
+            seats.put(seatNumber, reservedSeat);
+            reserveSeats.add(reservedSeat);
         });
+        return reserveSeats;
     }
 
      /**
@@ -79,7 +84,8 @@ public class Showtime {
      * @return true if the seat is reserved, false otherwise
      * @throws IllegalArgumentException if the seat identifier is invalid
      */
-    public boolean isSeatReserved(String seatNumber) {
+    public boolean isSeatReserved(Seat seat) {
+        String seatNumber = seat.getSeatNumber();
         if (!seats.containsKey(seatNumber)) {
             throw new IllegalArgumentException("Seat number " + seatNumber + " is not valid for this screen");
         }

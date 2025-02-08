@@ -2,7 +2,6 @@ package com.gic.cinema.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
@@ -11,13 +10,18 @@ import java.util.Set;
 import org.junit.Test;
 
 public class ShowtimesTest {
+    final static String MOVIE_NAME = "TestMovie";
+    final Seat a1 = Seat.createUnReservedSeat(1, 1);
+    final Seat a2 = Seat.createUnReservedSeat(1, 2);
+    final Seat b1 = Seat.createUnReservedSeat(2, 1);
+    final Seat b2 = Seat.createUnReservedSeat(2, 2);
     /**
      * Verifies that a Showtime is initialized with correct number of seats.
      */
     @Test
     public void testValidInitialization() {
         Screen screen = new Screen(10, 10);
-        Showtime showtimes = new Showtime("TestMovie", screen);
+        Showtime showtimes = new Showtime(MOVIE_NAME, screen);
         Map<String, Seat> seats = showtimes.getSeats();
 
         assertEquals("There should be 100 seats (10x10)", seats.size(), 100);
@@ -29,7 +33,7 @@ public class ShowtimesTest {
     @Test
     public void testSeatGeneration() {
         Screen screen = new Screen(2, 3);
-        Showtime showtimes = new Showtime("TestMovie", screen);
+        Showtime showtimes = new Showtime(MOVIE_NAME, screen);
         Map<String, Seat> seats = showtimes.getSeats();
 
         // Check seat number contains Row 1: A1, A2, A3; Row 2: B1, B2, B3.
@@ -47,13 +51,16 @@ public class ShowtimesTest {
     @Test
     public void testSetSeatReservation() {
         Screen screen = new Screen(2, 3);
-        Showtime showtimes = new Showtime("TestMovie", screen);
+        Showtime showtimes = new Showtime(MOVIE_NAME, screen);
+        Seat a1 = Seat.createUnReservedSeat(1, 1);
+        Seat a2 = Seat.createUnReservedSeat(1, 2);
+        Seat b1 = Seat.createUnReservedSeat(2, 1);
 
-        showtimes.reserveSeats(Set.of("A2", "B1"));
+        showtimes.reserveSeats(Set.of(a2, b1));
 
-        assertTrue("Seat 'A2' should be reserved", showtimes.isSeatReserved("A2"));
-        assertTrue("Seat 'B1' should be reserved", showtimes.isSeatReserved("B1"));
-        assertFalse("Seat 'B1' should be reserved", showtimes.isSeatReserved("B2"));
+        assertTrue("Seat 'A2' should be reserved", showtimes.isSeatReserved(a2.reserve()));
+        assertTrue("Seat 'B1' should be reserved", showtimes.isSeatReserved(b1.reserve()));
+        assertFalse("Seat 'A1' should not be reserved", showtimes.isSeatReserved(a1.reserve()));
     }
 
     /**
@@ -62,27 +69,15 @@ public class ShowtimesTest {
     @Test
     public void testGetSeatReservation() {
         Screen screen = new Screen(2, 3);
-        Showtime showtimes = new Showtime("TestMovie", screen);
+        Showtime showtimes = new Showtime(MOVIE_NAME, screen);
+        final Seat a1 = Seat.createUnReservedSeat(1, 1);
+        final Seat b2 = Seat.createUnReservedSeat(2, 2);
 
-        showtimes.reserveSeats(Set.of("A1", "B2"));
-        Set<String> reservedSeats = showtimes.getReservedSeats();
+        showtimes.reserveSeats(Set.of(a1, b2));
+        Set<Seat> reservedSeats = showtimes.getReservedSeats();
 
         assertTrue("Exactly 2 seats should have been reserved!", reservedSeats.size() == 2);
-        assertTrue("Seat 'A1' should have been reserved", reservedSeats.contains("A1"));
-        assertTrue("Seat 'B2' should have been reserved", reservedSeats.contains("B2"));
-    }
-
-    /**
-     * Test reserving using invalid identifiers
-     */
-    @Test
-    public void testInvalidIdReservation() {
-        Screen screen = new Screen(2, 3);
-        Showtime showtimes = new Showtime("TestMovie", screen);
-        String invalidSeatId = "Anmdx";
-
-        Exception exception = assertThrows(IllegalArgumentException.class,
-            () -> showtimes.reserveSeats(Set.of(invalidSeatId)));
-        assertTrue(exception.getMessage().contains("Seat number " + invalidSeatId + " is not valid for this screen"));
+        assertTrue("Seat 'A1' should have been reserved", reservedSeats.contains(a1.reserve()));
+        assertTrue("Seat 'B2' should have been reserved", reservedSeats.contains(b2.reserve()));
     }
 }

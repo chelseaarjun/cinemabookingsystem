@@ -1,5 +1,6 @@
 package com.gic.cinema.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -20,6 +21,7 @@ import lombok.ToString;
  *
  */
 @Getter
+@EqualsAndHashCode
 @ToString
 public class Screen {
     private final int MAX_SEATS_PER_ROW = 50;

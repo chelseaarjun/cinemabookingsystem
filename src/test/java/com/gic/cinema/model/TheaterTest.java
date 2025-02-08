@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,10 +17,9 @@ public class TheaterTest {
     @Test
     public void testGenerateAndRetrieveTicket() {
         Theater theater = new Theater("Inception", 5, 10);
-
-        Set<String> selectedSeats = new HashSet<>();
-        selectedSeats.add("A1");
-        selectedSeats.add("A2");
+        Seat a1 = Seat.createUnReservedSeat(1, 1);
+        Seat a2 = Seat.createUnReservedSeat(1, 2);
+        Set<Seat> selectedSeats = Set.of(a1, a2);
 
         Ticket ticket = theater.generateTicket(selectedSeats);
         assertNotNull("Generated ticket should not be null", ticket);

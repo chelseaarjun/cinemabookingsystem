@@ -1,7 +1,9 @@
 package com.gic.cinema.model;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -14,17 +16,36 @@ import lombok.ToString;
  * For example, if the counter is 1, the generated ticket ID will be "GIC0001".
  */
 @Getter
+@EqualsAndHashCode
 @ToString
 public class Ticket {
     private final static String TICKET_PREFIX = "GIC"; 
     private final String ticketId;
     private final Showtime showtime;
-    private final Set<String> reservedSeatIds;
+    private final Set<Seat> reservedSeatIds;
 
-    Ticket(@NonNull Showtime showtime, @NonNull Set<String> reservedSeatIds, int ticketCounter) {
+    Ticket(@NonNull Showtime showtime, @NonNull Set<Seat> reservedSeatIds, int ticketCounter) {
         this.ticketId = generateTicketID(ticketCounter);
         this.showtime = showtime;
         this.reservedSeatIds = reservedSeatIds;
+        checkSeatsReserved(reservedSeatIds);
+    }
+
+    /**
+     * Check all seats are reserved.
+     * @param counter:
+     * @throws IIlegalStateException if any of the seats are not reserved
+     * @return 
+     */
+    private void checkSeatsReserved(Set<Seat> reservedSeats){
+        int unreservedTicketCount = reservedSeats.stream()
+        .filter(s -> !s.isReserved())
+        .collect(Collectors.toSet())
+        .size();
+
+        if (unreservedTicketCount > 0) {
+            throw new IllegalStateException("Cannot create a ticket with unreserved seats");
+        }
     }
 
     /**

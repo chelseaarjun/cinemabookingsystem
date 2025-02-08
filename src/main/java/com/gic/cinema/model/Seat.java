@@ -1,5 +1,6 @@
 package com.gic.cinema.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -13,6 +14,7 @@ import lombok.ToString;
  * Seats are not reserved by default and can be marked as reserved.
  */
 @Getter
+@EqualsAndHashCode
 @ToString
 public class Seat {
     private final int row;

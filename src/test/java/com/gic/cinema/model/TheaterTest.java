@@ -12,22 +12,26 @@ import org.junit.Test;
 public class TheaterTest {
 
     /**
-     * Tests that a ticket can be retrieved using its ticket ID.
+     * Tests that a ticket can be retrieved using its ticket ID amd contains the correct seats
      */
     @Test
     public void testGenerateAndRetrieveTicket() {
         Theater theater = new Theater("Inception", 5, 10);
-        Seat a1 = Seat.createUnReservedSeat(1, 1);
-        Seat a2 = Seat.createUnReservedSeat(1, 2);
+        Seat a1 = theater.getScreen().generateSeat(1, 1);
+        Seat a2 = theater.getScreen().generateSeat(1, 2);
         Set<Seat> selectedSeats = Set.of(a1, a2);
 
         String ticketId = theater.generateTicketID();
         assertNotNull("Generated ticket should not be null", ticketId);
 
-        theater.confirmTicket(ticketId, selectedSeats);
+        theater.confirmBooking(ticketId, selectedSeats);
         Optional<Ticket> retrievedTicket = theater.getBookedTicket(ticketId);
-        assertTrue( "Ticket should be present in the booked tickets map", retrievedTicket.isPresent());
-        assertEquals("Retrieved ticket should match the generated ticket", retrievedTicket.get().getTicketId(), "GIC0001");
+       
+        assertTrue(retrievedTicket.isPresent());
+        assertEquals(retrievedTicket.get().getTicketId(), "GIC0001");
+        assertEquals(retrievedTicket.get().getReservedSeats().size(), 2);
+        assertTrue(retrievedTicket.get().getReservedSeats().contains(a1));
+        assertTrue(retrievedTicket.get().getReservedSeats().contains(a2));
     }
 
     /**
@@ -36,11 +40,11 @@ public class TheaterTest {
     @Test
     public void testTicketIDGeneration() {
         Theater theater = new Theater("Inception", 5, 10);
-        Seat a1 = Seat.createUnReservedSeat(1, 1);
-        Seat a2 = Seat.createUnReservedSeat(1, 2);
+        Seat a1 = theater.getScreen().generateSeat(1, 1);
+        Seat a2 = theater.getScreen().generateSeat(1, 2);
 
-        theater.confirmTicket(theater.generateTicketID(), Set.of(a1));
-        theater.confirmTicket(theater.generateTicketID(), Set.of(a2));
+        theater.confirmBooking(theater.generateTicketID(), Set.of(a1));
+        theater.confirmBooking(theater.generateTicketID(), Set.of(a2));
 
         Optional<Ticket> ticket1 = theater.getBookedTicket("GIC0001");
         assertTrue( "Ticket should be present in the booked tickets map", ticket1.isPresent());
@@ -52,7 +56,7 @@ public class TheaterTest {
     }
 
     /**
-     * Tests that trying to retrieve a non-existent ticket causes a NullPointerException.
+     * Tests that is trying to retrieve a non-existent ticket causes a NullPointerException.
      * <p>
      * Note: Because getBookedTicket uses Optional.of instead of Optional.ofNullable,
      * passing a non-existent ticket ID will throw an exception.

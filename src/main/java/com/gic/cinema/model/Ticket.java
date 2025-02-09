@@ -1,7 +1,6 @@
 package com.gic.cinema.model;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -28,24 +27,6 @@ public class Ticket {
         this.ticketId = ticketId;
         this.showtime = showtime;
         this.reservedSeats = reservedSeats;
-        checkSeatsReserved(reservedSeats);
-    }
-
-    /**
-     * Check all seats are reserved.
-     * @param counter:
-     * @throws IIlegalStateException if any of the seats are not reserved
-     * @return 
-     */
-    private void checkSeatsReserved(Set<Seat> reservedSeats){
-        int unreservedTicketCount = reservedSeats.stream()
-        .filter(s -> !s.isReserved())
-        .collect(Collectors.toSet())
-        .size();
-
-        if (unreservedTicketCount > 0) {
-            throw new IllegalStateException("Cannot create a ticket with unreserved seats");
-        }
     }
 
     /**

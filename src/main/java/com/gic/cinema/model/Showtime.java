@@ -1,8 +1,5 @@
 package com.gic.cinema.model;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,8 +20,7 @@ import lombok.ToString;
 @ToString
 public class Showtime {
     private final String movieName;
-    private final Screen screen;
-    private final Map<String, Seat> seats;
+    private final ScreenLayout screenLayout;
 
     /**
      * Constructs a new Showtime instance.
@@ -32,32 +28,43 @@ public class Showtime {
      * @param movieName the name of the movie
      * @param screen    the screen for the showtime
      */
-    public Showtime(String movieName, Screen screen) {
+    public Showtime(String movieName, ScreenLayout screenLayout) {
         this.movieName = movieName;
-        this.screen = screen;
-        this.seats = initializeSeats();
+        this.screenLayout = screenLayout;
     }
 
     /**
-     * Gets the number of remaining seats for this showtime.
+     * Gets the available seat count for this showtime.
      * 
      * @return the number of remaining unreserved seats
      */
-    public int getNumRemainingSeats() {
-        return  seats.values().stream()
-            .filter(s -> s.isReserved())
-            .map(s -> s.getSeatNumber())
-            .collect(Collectors.toList())
-            .size();
+    public long getAvailableSeatCount() {
+        return screenLayout.getSeatAvailability()
+            .values().stream().filter(isReserved -> !isReserved).count();
     }
-    
+
+    /**
+     * Gets the available seat count for this showtime.
+     * 
+     * @return next n available seats
+     */
+    public Set<Seat> getAvailableSeats(int n) {
+        return screenLayout.getNextAvailableSeats(n);
+    }
+
+    public Set<Seat> getAvailableSeats(String seatId, int n)  {
+        return screenLayout.getNextAvailableSeats(seatId, n);
+    }
+
     /**
      * Get the set of reserved seat identifiers for this showtime.
      * @return
      */
     public Set<Seat> getReservedSeats() {
-        return  seats.values().stream()
-            .filter(s -> s.isReserved())
+        return  screenLayout.getSeatAvailability()
+            .entrySet().stream()
+            .filter(entry -> entry.getValue())
+            .map(entry -> entry.getKey())
             .collect(Collectors.toSet());
     }
 
@@ -69,38 +76,8 @@ public class Showtime {
      */
     Set<Seat> reserveSeats(Set<Seat> selectedSeats) {
         selectedSeats.forEach(seat -> {
-            Seat reservedSeat = seat.reserve();
-            seats.put(seat.getSeatNumber(), reservedSeat);
+            screenLayout.reserveSeat(seat);
         });
         return getReservedSeats();
-    }
-
-     /**
-     * Check if the specified seat identifier is reserved.
-     * @param seat seat identifier 
-     * @return true if the seat is reserved, false otherwise
-     * @throws IllegalArgumentException if the seat identifier is invalid
-     */
-    public boolean isSeatReserved(Seat seat) {
-        String seatNumber = seat.getSeatNumber();
-        if (!seats.containsKey(seatNumber)) {
-            throw new IllegalArgumentException("Seat number " + seatNumber + " is not valid for this screen");
-        }
-        return seats.get(seatNumber).isReserved();
-    }
-
-    /**
-     * Initialize the seats for this showtime.
-     * @return
-     */
-    private Map<String, Seat> initializeSeats() {
-        Map<String, Seat> seats = new HashMap<String, Seat>();
-        for (int row = 1; row <= screen.getRows(); row++) {
-            for (int seatNum = 1; seatNum <= screen.getSeatsPerRow(); seatNum++) {
-                Seat seat = Seat.createUnReservedSeat(row, seatNum);
-                seats.put(seat.getSeatNumber(), seat);
-            }
-        }
-        return seats;
     }
 }

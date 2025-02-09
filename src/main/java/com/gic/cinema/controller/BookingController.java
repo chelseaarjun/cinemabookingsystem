@@ -7,21 +7,25 @@ import com.gic.cinema.model.Seat;
 import com.gic.cinema.model.Theater;
 import com.gic.cinema.model.Ticket;
 import com.gic.cinema.view.BookingView;
+import com.gic.cinema.view.ScreenLayoutView;
 
 public class BookingController {
     private final Theater theater;
-    private final BookingView view;
+    private final BookingView bookingView;
+    private final ScreenLayoutView screenLayoutView;
+
     
-    public BookingController(Theater theater, BookingView view) {
+    public BookingController(Theater theater, BookingView bookingView, ScreenLayoutView screenLayoutView) {
         this.theater = theater;
-        this.view = view;
+        this.bookingView = bookingView;
+        this.screenLayoutView = screenLayoutView;
     }
     
     // Start processing the user input loop.
     public void start() {
         boolean isRunning = true;
         while (isRunning) {
-            int option = view.displayMainMenu(theater.getShowtime().getMovieName(), theater.getShowtime().getNumRemainingSeats());
+            int option = bookingView.displayMainMenu(theater.getShowtime().getMovieName(), theater.getShowtime().getAvailableSeatCount());
             switch (option) {
                 case 1:
                     processBooking();
@@ -33,7 +37,7 @@ public class BookingController {
                     isRunning = false;
                     break;
                 default:
-                    view.showMessage("\nInvalid choice. Please try again.");
+                    bookingView.showMessage("\nInvalid choice. Please try again.");
             }
         }
     }
@@ -42,17 +46,17 @@ public class BookingController {
     private void processBooking() {
         boolean isBookingFlowComplete = false;
         while (!isBookingFlowComplete) {
-            Optional<Integer> numSeatsToBookOpt = view.promptNumberOfSeats();
+            Optional<Integer> numSeatsToBookOpt = bookingView.promptNumberOfSeats();
             if (numSeatsToBookOpt.isEmpty()) {
                 isBookingFlowComplete = true;
                 continue;
             }
             int numSeatsToBook = numSeatsToBookOpt.get();
             if (numSeatsToBook <= 0) {
-                view.showMessage("\nSorry, invalid entry!");
+                bookingView.showMessage("\nSorry, invalid entry!");
                 return;
-            } else if (numSeatsToBook > theater.getShowtime().getNumRemainingSeats()) {
-                view.showMessage("\nSorry, there are only " + theater.getShowtime().getNumRemainingSeats() + " seats available.");
+            } else if (numSeatsToBook > theater.getShowtime().getAvailableSeatCount()) {
+                bookingView.showMessage("\nSorry, there are only " + theater.getShowtime().getAvailableSeatCount() + " seats available.");
                 return;
             }
             try {
@@ -60,32 +64,35 @@ public class BookingController {
                 processSeatSelection(numSeatsToBook);
                 isBookingFlowComplete = true;
             } catch (Exception e) {
-                view.showMessage("\nError booking ticket: " + e.getMessage());
+                bookingView.showMessage("\nError booking ticket: " + e.getMessage());
             }
         }
     }
     
     private void processSeatSelection(int numSeatsToBook) {
-        Set<Seat> selectedSeats = SeatSelectionController.findNextAvailableSeatsForBooking(theater.getShowtime(), numSeatsToBook);
+        Set<Seat> selectedSeats = theater.getShowtime().getAvailableSeats(numSeatsToBook);
         
         String ticketId = theater.generateTicketID();
-        view.showMessage(String.format("\nSuccessfully reserved %d %s tickets.", numSeatsToBook, theater.getShowtime().getMovieName()));
-        view.showMessage("\nBooking Id: %s confirmed." + ticketId);
+        bookingView.showMessage(String.format("\nSuccessfully reserved %d %s tickets.", numSeatsToBook, theater.getShowtime().getMovieName()));
+        bookingView.showMessage("\nBooking Id: %s confirmed." + ticketId);
         // Display the selected seats (optional, for demonstration purposes).
-        
+        screenLayoutView.printScreenLayout(theater.getShowtime(), selectedSeats);
+
         boolean isSeatSelectionComplete = false;
 
         while (!isSeatSelectionComplete) {
-            Optional<String> changeSeatSelectionOpt = view.promptChangeSeatSelection();
+            Optional<String> changeSeatSelectionOpt = bookingView.promptChangeSeatSelection();
             if (changeSeatSelectionOpt.isEmpty()) {
                 isSeatSelectionComplete = true;
-                theater.confirmTicket(ticketId, selectedSeats);
-                view.showMessage("\nBooking Id: " + ticketId + " confirmed.");
+                theater.confirmBooking(ticketId, selectedSeats);
+                bookingView.showMessage("\nBooking Id: " + ticketId + " confirmed.");
             } else {
                 String startSeat = changeSeatSelectionOpt.get();
-                selectedSeats = SeatSelectionController.findNextAvailableSeatsForBooking(theater.getShowtime(), numSeatsToBook, startSeat);
-                view.showMessage(String.format("\nSuccessfully reserved %d %s tickets.", numSeatsToBook, theater.getShowtime().getMovieName()));
-                view.showMessage("\nBooking Id: %s confirmed." + ticketId);
+                selectedSeats = theater.getShowtime().getAvailableSeats(startSeat, numSeatsToBook);
+                // Display the selected seats
+
+                bookingView.showMessage(String.format("\nSuccessfully reserved %d %s tickets.", numSeatsToBook, theater.getShowtime().getMovieName()));
+                bookingView.showMessage("\nBooking Id: %s confirmed." + ticketId);
             }
         }
     }
@@ -94,18 +101,18 @@ public class BookingController {
     private void processCheckBooking() {
         boolean isCheckBookingFlowComplete = false;
         while (!isCheckBookingFlowComplete) {
-            Optional<String> bookingId = view.promptBookingId();
+            Optional<String> bookingId = bookingView.promptBookingId();
             if (bookingId.isEmpty()) {
                 isCheckBookingFlowComplete = true;
                 continue;
             }
             Optional<Ticket> ticketOpt = theater.getBookedTicket(bookingId.get());
             if (!ticketOpt.isPresent()) {
-                view.showMessage("\nInvalid booking id. No booking found.");
+                bookingView.showMessage("\nInvalid booking id. No booking found. Try again!.");
             } else {
                 Ticket ticket = ticketOpt.get();
-                view.showMessage("\nBooking Id: " + ticket.getTicketId());
-                view.showMessage("Selected Seats:" + ticket.getReservedSeats());
+                bookingView.showMessage("\nBooking Id: " + ticket.getTicketId());
+                bookingView.showMessage("Selected Seats:" + ticket.getReservedSeats());
                 // Here you could also call a dedicated layout printer if needed.
             }
         }

@@ -2,22 +2,26 @@
 A Java basedd Cineam booking System that takes in a movie title. number of rows and number of seats rows as input and allows booking tickets for the movie as well as checking the s
 
 ## Entities
-- A Movie theater can have many Showtimes and many Screens
-- A Screen has a max row and seats per row 
-- A Showtime is for a particular movie and shown at a particular Screen which determines the number of seats a showtime can have
+- A Seat has row and a column number
+- A Screen has a many Seats. It also has a max row and seats per row setting but each screen instance of a screen can hava a lower number of rows and seats. Screen also determines how the seats are numbered.
+- A ScreenLayout determines the order seats are selected for a given Screen. 
+- A Showtime is for a particular movie, ScreenLayout 
 - A Ticket is for particular Showtime and specified number of seats.
-- A Seat has row and a
+- A Theater can have many Showtimes and many Screens
 
 ## Design Consideration
 - Separation of concern, Single Responsibility Principle, Abstraction, Encapsultion and Immutability
-- Flexiblity to extend to support multiple screens, showtimes and theaters in future- 
+- Flexiblity to support multiple screens, showtimes and theaters in future
 - Flexiblity to support new seat selection logic in future
+- Flexiblity to have screens with different max rows and seats per row settings in future
+- Flexibility to have screens that follow a differnt seat identifier scheme
 
 ## Assumptions
 - Movie Title is a single word
 - The number portion of a TicketID is exacty 4 digits so the max id that can be generated is GIC9999
-- There is only one showtime a movie. Although this can be supported with changes to Theater Class.
-- No two users are using the system as the same time (there will be conflict as they both might get a reservation number with same seats)
+- There is only one showtime a movie. Although this can be supported with changes in future.
+- There is only one Theater.
+- No two users are using the system at the same time (there will be conflict as they both might get a reservation number with same seats and ticketID)
 
 ## Prerequisite
 

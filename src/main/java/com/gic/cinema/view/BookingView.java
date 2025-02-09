@@ -16,7 +16,7 @@ public class BookingView {
     }
     
     // Display the main menu and return the selected option.
-    public int displayMainMenu(String movieName, int availableSeats) {
+    public int displayMainMenu(String movieName, long availableSeats) {
         System.out.println("\nWelcome to Cinema Booking System for " + movieName +
                            " (" + availableSeats + " seats available).");
         System.out.println("Options:");

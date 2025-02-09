@@ -36,8 +36,8 @@ public class Theater {
     private final Map<String, Ticket> tickets;
 
     public Theater(@NonNull String movieName, int rows, int seatsPerRow) {
-        this.screen = new Screen(rows, seatsPerRow);
-        this.showtime = new Showtime(movieName, screen);
+        this.screen = new DefaultScreen(rows, seatsPerRow);
+        this.showtime = new Showtime(movieName, new DefaultScreenLayout(screen));
         this.tickets = new HashMap<>();
     }
     
@@ -84,7 +84,7 @@ public class Theater {
      * @param selectedSeats a set of seat identifiers (e.g., "A1", "B12") to be booked
      * @return the newly generated Ticket 
      */
-    public void confirmTicket(String ticketID, Set<Seat> selectedSeats) {
+    public void confirmBooking(String ticketID, Set<Seat> selectedSeats) {
         Set<Seat> reservedSeats = this.showtime.reserveSeats(selectedSeats);
         Ticket ticket = new Ticket(ticketID, this.showtime, reservedSeats);
         tickets.put(ticket.getTicketId(), ticket);

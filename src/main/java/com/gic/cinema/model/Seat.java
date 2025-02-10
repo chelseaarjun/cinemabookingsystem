@@ -17,21 +17,19 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class Seat {
-    private final int row;
-    private final int rowNumber;
-    private final String seatId;
+    private final int rowIndex;
+    private final int seatPosIndex;
 
     /**
      * Constructs a seat with specified row, number and isReserved status
      * 
-     * @param row  the theater row number (1-26)
-     * @param number the seat position within row (≥1)
+     * @param rowIndex  the theater row number (1-26)
+     * @param seatPos the seat position within row (≥1)
      * @param number reserved true or false
      * @throws IllegalStateException if row exceeds 26 (maximum letter 'Z') or is less than 1
     */
-    Seat(int row, int number, String seatId) {
-        this.row = row;
-        this.rowNumber = number;
-        this.seatId = seatId;
+    Seat(int rowIndex, int seatPosIndex) {
+        this.rowIndex = rowIndex;
+        this.seatPosIndex = seatPosIndex;
     }
 }

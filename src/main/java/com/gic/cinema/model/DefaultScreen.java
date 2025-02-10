@@ -2,6 +2,7 @@ package com.gic.cinema.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.ToString;
 
 /**
@@ -22,8 +23,8 @@ class DefaultScreen extends Screen {
     private final static int MAX_SEATS_PER_ROW = 50;
     private final static int MAX_ROWS = 26;
 
-    DefaultScreen(int rows, int seatsPerRow) {
-        super(rows, seatsPerRow, MAX_ROWS, MAX_SEATS_PER_ROW);     
+    DefaultScreen(int totalRows, int seatsPerRow) {
+        super(totalRows, seatsPerRow, MAX_ROWS, MAX_SEATS_PER_ROW, new DefaultScreenLayout(FIRST_ROW_INDEX, totalRows, FIRST_SEATPOS_INDEX, seatsPerRow));     
     }
 
     /**
@@ -35,27 +36,29 @@ class DefaultScreen extends Screen {
      * @throws IllegalStateException if row exceeds letter 'Z' (26 rows)
      */
     @Override
-    Seat generateSeat(int rowIndex, int rowNumber) {
-        if(isWithinBounds(rowIndex, rowNumber)) {
-            return new Seat(rowIndex, rowNumber, String.format("%c%d", (char)('A' + rowIndex - 1), rowNumber));
+    String getSeatId(@NonNull Seat seat) {
+        int rowIndex = seat.getRowIndex();
+        int seatPosIndex = seat.getSeatPosIndex();
+        if(isWithinBounds(seat)) {
+            return String.format("%c%d", (char)('A' + rowIndex - 1), seatPosIndex);
         }
         throw new IllegalArgumentException(INVALID_SEAT_MESSSAGE);
     }
 
      @Override
-    Seat parseSeatId(String seatId) {
-        if (seatId == null || seatId.isEmpty() || seatId.length() > 4) {
+    Seat parseSeatId(@NonNull String seatId) {
+        if (seatId.isEmpty() || seatId.length() > 4) {
             throw new IllegalArgumentException(INVALID_SEAT_MESSSAGE);
         }
         
         char rowChar = Character.toUpperCase(seatId.charAt(0));
         if (rowChar >= 'A' || rowChar <= 'Z') {
             int rowIndex = Integer.valueOf(rowChar - 'A' + 1);
-            String rowNumberStr = seatId.substring(1);
+            String seatPosStr = seatId.substring(1);
             try {
-                int rowNumber = Integer.parseInt(rowNumberStr);
-                Seat seat = generateSeat(rowIndex, rowNumber);
-                if(isWithinBounds(rowIndex, rowNumber)) {
+                int seatPosIndex = Integer.parseInt(seatPosStr);
+                Seat seat = new Seat(rowIndex, seatPosIndex);
+                if(isWithinBounds(seat)) {
                     return seat;
                 }
                 throw new IllegalArgumentException(INVALID_SEAT_MESSSAGE);

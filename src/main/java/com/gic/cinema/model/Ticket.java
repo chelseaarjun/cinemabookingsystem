@@ -18,26 +18,27 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class Ticket {
-    private final static String TICKET_PREFIX = "GIC"; 
     private final String ticketId;
     private final Showtime showtime;
-    private final Set<Seat> reservedSeats;
+    private final Set<Seat> seats;
 
-    Ticket(@NonNull String ticketId, @NonNull Showtime showtime, @NonNull Set<Seat> reservedSeats) {
+    Ticket(@NonNull String ticketId, @NonNull Showtime showtime, @NonNull Set<Seat> seats) {
         this.ticketId = ticketId;
         this.showtime = showtime;
-        this.reservedSeats = reservedSeats;
+        this.seats = seats;
     }
 
-    /**
-     * Generate ticket IDs of the format GIC0001, GIC0002 etc.
-     * @param counter: 
-     * @return 
+     /**
+     * Generates a new ticket with selected seats.
+     * <p>
+     * Given ticketId is confirm for the showtime and the selected seats.
+     * The ticket is then stored in the theater’s tickets map
+     * </p>
+     *
+     * @param selectedSeats a set of seat identifiers (e.g., "A1", "B12") to be booked
+     * @return the newly generated Ticket 
      */
-    static String generateTicketID(int ticketCounter){
-        if (ticketCounter > 9999) {
-            throw new IllegalStateException("Ticket counter is not expected to be more than 4 digits!!!");
-        }
-        return String.format("%s%04d", TICKET_PREFIX, ticketCounter);
+    void confirmBooking() {
+       this.showtime.reserveSeats(seats);
     }
 }

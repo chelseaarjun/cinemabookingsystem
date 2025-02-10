@@ -7,26 +7,26 @@ import com.gic.cinema.model.Seat;
 import com.gic.cinema.model.Theater;
 import com.gic.cinema.model.Ticket;
 import com.gic.cinema.view.BookingView;
-import com.gic.cinema.view.ScreenLayoutView;
 
 public class BookingController {
     private final Theater theater;
     private final BookingView bookingView;
-    private final ScreenLayoutView screenLayoutView;
-
     
-    public BookingController(Theater theater, BookingView bookingView, ScreenLayoutView screenLayoutView) {
+    public BookingController(Theater theater, BookingView bookingView) {
         this.theater = theater;
         this.bookingView = bookingView;
-        this.screenLayoutView = screenLayoutView;
     }
     
     // Start processing the user input loop.
     public void start() {
         boolean isRunning = true;
         while (isRunning) {
-            int option = bookingView.displayMainMenu(theater.getShowtime().getMovieName(), theater.getShowtime().getAvailableSeatCount());
-            switch (option) {
+            Optional<Integer> option = bookingView.displayMainMenu(theater.getShowtime().getMovieName(), theater.getShowtime().getAvailableSeatCount());
+            if (!option.isPresent()) {
+                bookingView.showMessage("\nInvalid choice. Please try again.");
+                continue;
+            }
+            switch (option.get()) {
                 case 1:
                     processBooking();
                     break;
@@ -34,6 +34,7 @@ public class BookingController {
                     processCheckBooking();
                     break;
                 case 3:
+                    bookingView.showMessage("\nThank you for using GIC Cinema system. Bye!");
                     isRunning = false;
                     break;
                 default:
@@ -54,10 +55,10 @@ public class BookingController {
             int numSeatsToBook = numSeatsToBookOpt.get();
             if (numSeatsToBook <= 0) {
                 bookingView.showMessage("\nSorry, invalid entry!");
-                return;
+                continue;
             } else if (numSeatsToBook > theater.getShowtime().getAvailableSeatCount()) {
                 bookingView.showMessage("\nSorry, there are only " + theater.getShowtime().getAvailableSeatCount() + " seats available.");
-                return;
+                continue;
             }
             try {
                 // Delegate seat selection to a separate strategy—this example assumes a SeatSelector exists.
@@ -70,29 +71,29 @@ public class BookingController {
     }
     
     private void processSeatSelection(int numSeatsToBook) {
-        Set<Seat> selectedSeats = theater.getShowtime().getAvailableSeats(numSeatsToBook);
+        Set<Seat> selectedSeats = theater.getShowtime().getNextAvailableSeats(numSeatsToBook);
         
-        String ticketId = theater.generateTicketID();
-        bookingView.showMessage(String.format("\nSuccessfully reserved %d %s tickets.", numSeatsToBook, theater.getShowtime().getMovieName()));
-        bookingView.showMessage("\nBooking Id: %s confirmed." + ticketId);
-        // Display the selected seats (optional, for demonstration purposes).
-        screenLayoutView.printScreenLayout(theater.getShowtime(), selectedSeats);
+        Ticket ticket = theater.generateTicket(selectedSeats);
+        bookingView.showMessage(String.format("\nSuccessfully reserved %d %s tickets.", numSeatsToBook, theater.getShowtime().getMovieName()), false);
+        bookingView.showTicket(ticket);
 
         boolean isSeatSelectionComplete = false;
 
         while (!isSeatSelectionComplete) {
             Optional<String> changeSeatSelectionOpt = bookingView.promptChangeSeatSelection();
-            if (changeSeatSelectionOpt.isEmpty()) {
+            if (!changeSeatSelectionOpt.isPresent()) {
+                bookingView.showMessage("\nInvalid entry. Try again!.");
+                continue;
+            }
+            if (changeSeatSelectionOpt.get().isBlank()) {
                 isSeatSelectionComplete = true;
-                theater.confirmBooking(ticketId, selectedSeats);
-                bookingView.showMessage("\nBooking Id: " + ticketId + " confirmed.");
+                theater.confirmTicket(ticket);
+                bookingView.showMessage("Booking Id: " + ticket.getTicketId() + " confirmed.");
             } else {
                 String startSeat = changeSeatSelectionOpt.get();
-                selectedSeats = theater.getShowtime().getAvailableSeats(startSeat, numSeatsToBook);
-                // Display the selected seats
-
+                selectedSeats = theater.getShowtime().getNextAvailableSeats(numSeatsToBook, startSeat);
                 bookingView.showMessage(String.format("\nSuccessfully reserved %d %s tickets.", numSeatsToBook, theater.getShowtime().getMovieName()));
-                bookingView.showMessage("\nBooking Id: %s confirmed." + ticketId);
+                bookingView.showTicket(ticket);
             }
         }
     }
@@ -102,7 +103,11 @@ public class BookingController {
         boolean isCheckBookingFlowComplete = false;
         while (!isCheckBookingFlowComplete) {
             Optional<String> bookingId = bookingView.promptBookingId();
-            if (bookingId.isEmpty()) {
+            if (!bookingId.isPresent()) {
+                bookingView.showMessage("\nInvalid booking id. No booking found. Try again!.");
+                continue;
+            }
+            if ( bookingId.get().isBlank()) {
                 isCheckBookingFlowComplete = true;
                 continue;
             }
@@ -111,9 +116,7 @@ public class BookingController {
                 bookingView.showMessage("\nInvalid booking id. No booking found. Try again!.");
             } else {
                 Ticket ticket = ticketOpt.get();
-                bookingView.showMessage("\nBooking Id: " + ticket.getTicketId());
-                bookingView.showMessage("Selected Seats:" + ticket.getReservedSeats());
-                // Here you could also call a dedicated layout printer if needed.
+                bookingView.showTicket(ticket);
             }
         }
     }

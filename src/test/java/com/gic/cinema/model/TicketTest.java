@@ -1,26 +1,33 @@
 package com.gic.cinema.model;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Set;
 
 import org.junit.Test;
 
 public class TicketTest {
-    /**
-     *  * Test case to verify that the ticket ID is generated in the correct format.
+    final static String MOVIE_NAME = "TestMovie";
+    final static Screen SCREEN = new DefaultScreen(10, 10);
+    final static Showtime SHOWTIME = new Showtime(MOVIE_NAME, SCREEN);
+
+     /**
+     * Tests that a ticket can be retrieved using its ticket ID amd contains the correct seats
      */
     @Test
-    public void ticketIdFormatCorrect() {
-        String ticketid = Ticket.generateTicketID(5);
-        assertEquals("GIC0005", ticketid);
-    }
+    public void testtConfirmBooking() {
+        Seat a1 = new Seat(1, 1);
+        Seat a2 = new Seat(1, 2);
+        Set<Seat> selectedSeats = Set.of(a1, a2);
 
-    @Test
-    public void ticketIdGenerationThrowsException() {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            Ticket.generateTicketID(10000);
-        });
-        assertEquals("Ticket counter is not expected to be more than 4 digits!!!", exception.getMessage());
+        Ticket ticket = new Ticket("TicketID", SHOWTIME, selectedSeats);
+
+        ticket.confirmBooking();
+     
+        assertEquals(2, ticket.getSeats().size());
+        assertTrue(ticket.getSeats().contains(a1));
+        assertTrue(ticket.getSeats().contains(a2));
     }
 }
 

@@ -1,7 +1,6 @@
 package com.gic.cinema.model;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
@@ -12,47 +11,29 @@ import org.junit.Test;
 public class TheaterTest {
 
     /**
-     * Tests that a ticket can be retrieved using its ticket ID amd contains the correct seats
-     */
-    @Test
-    public void testGenerateAndRetrieveTicket() {
-        Theater theater = new Theater("Inception", 5, 10);
-        Seat a1 = theater.getScreen().generateSeat(1, 1);
-        Seat a2 = theater.getScreen().generateSeat(1, 2);
-        Set<Seat> selectedSeats = Set.of(a1, a2);
-
-        String ticketId = theater.generateTicketID();
-        assertNotNull("Generated ticket should not be null", ticketId);
-
-        theater.confirmBooking(ticketId, selectedSeats);
-        Optional<Ticket> retrievedTicket = theater.getBookedTicket(ticketId);
-       
-        assertTrue(retrievedTicket.isPresent());
-        assertEquals(retrievedTicket.get().getTicketId(), "GIC0001");
-        assertEquals(retrievedTicket.get().getReservedSeats().size(), 2);
-        assertTrue(retrievedTicket.get().getReservedSeats().contains(a1));
-        assertTrue(retrievedTicket.get().getReservedSeats().contains(a2));
-    }
-
-    /**
      * Tests that a ticket id is generated properly.
      */
     @Test
     public void testTicketIDGeneration() {
         Theater theater = new Theater("Inception", 5, 10);
-        Seat a1 = theater.getScreen().generateSeat(1, 1);
-        Seat a2 = theater.getScreen().generateSeat(1, 2);
+        Seat a1 = new Seat(1, 1);
+        Seat a2 = new Seat(1, 2);
 
-        theater.confirmBooking(theater.generateTicketID(), Set.of(a1));
-        theater.confirmBooking(theater.generateTicketID(), Set.of(a2));
+        Ticket expectedTicket1 = theater.generateTicket(Set.of(a1));
+        theater.confirmTicket(expectedTicket1);
 
-        Optional<Ticket> ticket1 = theater.getBookedTicket("GIC0001");
-        assertTrue( "Ticket should be present in the booked tickets map", ticket1.isPresent());
-        assertEquals("Retrieved ticket should match the generated ticket", ticket1.get().getTicketId(), "GIC0001");
+        Ticket expectedTicket2 = theater.generateTicket(Set.of(a2));
+        theater.confirmTicket(expectedTicket2);
 
-        Optional<Ticket> ticket2 = theater.getBookedTicket("GIC0002");
-        assertTrue( "Ticket should be present in the booked tickets map", ticket2.isPresent());
-        assertEquals("Retrieved ticket should match the generated ticket", ticket2.get().getTicketId(), "GIC0002");
+        assertEquals("Expected 2 booked tickets", 2, theater.getTickets().size());
+            
+        Optional<Ticket> actualTicket1 = theater.getBookedTicket("GIC0001");
+        assertTrue("Could not find Booking ID GIC0001", actualTicket1.isPresent());
+        assertEquals("Retrieved ticket should match the generated ticket", expectedTicket1, actualTicket1.get());
+
+        Optional<Ticket> actualTicket2 = theater.getBookedTicket("GIC0002");
+        assertTrue("Could not find Booking ID GIC0002", actualTicket1.isPresent());
+        assertEquals("Retrieved ticket should match the generated ticket", expectedTicket2, actualTicket2.get());
     }
 
     /**
@@ -68,5 +49,15 @@ public class TheaterTest {
         Optional<Ticket> retrievedTicket = theater.getBookedTicket("non-existent-id");
 
         assertTrue("Ticket should be empty when trying to retrieve a non existent id", retrievedTicket.isEmpty());
+    }
+
+    /**
+     *  * Test case to verify that the ticket ID is generated in the correct format.
+     */
+    @Test
+    public void ticketIdFormatCorrect() {
+        Theater theater = new Theater("Inception", 5, 10);
+        String ticketid = theater.generateTicketID();
+        assertEquals("GIC0001", ticketid);
     }
 }

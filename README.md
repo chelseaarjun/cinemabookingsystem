@@ -1,13 +1,15 @@
 # Cinema Booking System
 A Java basedd Cineam booking System that takes in a movie title. number of rows and number of seats rows as input and allows booking tickets for the movie as well as checking the s
 
-## Entities
-- A Seat has row and a column number
-- A Screen has a many Seats. It also has a max row and seats per row setting but each screen instance of a screen can hava a lower number of rows and seats. Screen also determines how the seats are numbered.
-- A ScreenLayout determines the order seats are selected for a given Screen. 
-- A Showtime is for a particular movie, ScreenLayout 
-- A Ticket is for particular Showtime and specified number of seats.
-- A Theater can have many Showtimes and many Screens
+## Assumptions
+- Movie Title is a single word
+- The number portion of a TicketID is exacty 4 digits so the max id that can be generated is GIC9999
+- There is only one showtime a movie. Although this can be supported with changes in future.
+- There is only one Theater.
+- Only one ticket can be booked at time.
+- No two users are using the system at the same time (there will be conflict as they both might get a reservation number with same seats and ticketID)
+- Screens will always follow a row, row per seats format although the numbering scheme for seats could change and could support more rows and row per seats in future.
+- Each row has the same rows per seat.
 
 ## Design Consideration
 - Separation of concern, Single Responsibility Principle, Abstraction, Encapsultion and Immutability
@@ -16,12 +18,13 @@ A Java basedd Cineam booking System that takes in a movie title. number of rows 
 - Flexiblity to have screens with different max rows and seats per row settings in future
 - Flexibility to have screens that follow a differnt seat identifier scheme
 
-## Assumptions
-- Movie Title is a single word
-- The number portion of a TicketID is exacty 4 digits so the max id that can be generated is GIC9999
-- There is only one showtime a movie. Although this can be supported with changes in future.
-- There is only one Theater.
-- No two users are using the system at the same time (there will be conflict as they both might get a reservation number with same seats and ticketID)
+## Entities
+- A Seat has row and a column number
+- A Screen has a many Seats. It also has a max row and seats per row setting but each screen instance of a screen can hava a lower number of rows and seats. Screen also determines how the seats are numbered.
+- A ScreenLayout determines the order seats are selected for a given Screen. 
+- A Showtime is for a particular movie, ScreenLayout 
+- A Ticket is for particular Showtime and specified number of seats.
+- A Theater can have many Showtimes and many Screens
 
 ## Prerequisite
 

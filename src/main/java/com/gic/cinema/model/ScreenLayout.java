@@ -1,6 +1,5 @@
 package com.gic.cinema.model;
 
-import java.util.Map;
 import java.util.Set;
 
 import lombok.EqualsAndHashCode;
@@ -15,61 +14,57 @@ import lombok.ToString;
 @Getter
 @EqualsAndHashCode
 @ToString
-public abstract class ScreenLayout {
-    private final Screen screen;
-    private final Map<Seat,Boolean> seatAvailability; 
+abstract class ScreenLayout {
+    final int firstRowIndex;
+    final int firtSeatPosIndex;
+    final int totalRows;
+    final int seatsPerRow;
             
     /**
      * Constructs a new Screen Layout
      * <p>
      * This constructor initializes the seating arrangement based on the provided
-     * number of rows and seats per row. It validates that the number of rows does not exceed
-     * {@code MAX_ROWS} and the number of seats per row does not exceed {@code MAX_SEATS_PER_ROW}. If these conditions are not met,
-     * an {@link IllegalArgumentException} is thrown.
+     * number of rows and seats per row.
      * </p>
      * 
-     * @param rows        the number of rows in the screen.
-     * @param seatsPerRow the number of seats in each row.
+     * @param screen the screen associated with this layout
      * @throws IllegalArgumentException if {@code rows} is greater than {@code MAX_ROWS} or
      *                                  {@code seatsPerRow} is greater than {@code MAX_SEATS_PER_ROW}.
      */
-    ScreenLayout(Screen screen) {
-        this.screen = screen;
-        this.seatAvailability = screen.initializeSeats();
+    ScreenLayout(int firstRowIndex, int totalRows, int firtSeatPosIndex, int seatsPerRow) {
+        this.firstRowIndex = firstRowIndex;
+        this.totalRows = totalRows;
+        this.firtSeatPosIndex = firtSeatPosIndex;
+        this.seatsPerRow = seatsPerRow;
     }
 
     /**
-     * Returns a list of the next n available seat identifiers in the layout,
-     * using a default row-major ordering (e.g., "A1", "A2", "A3", etc.).
+     * Returns a list of the next n available seats in the layout using a default row-major ordering (e.g., "A1", "A2", "A3", etc.).
      *
-     * @param n the number of available seats to retrieve
-     * @return a list of seat identifiers representing the next available seats.
-     *         If fewer than n seats are available, returns all available seats.
+     * @param numSeats the number of available seats to retrieve
+     * @return a list of seats representing the next available seats. If fewer than n seats are available, returns all available seats.
      */
-    abstract Set<Seat> getNextAvailableSeats(int n);
+    abstract Set<Seat> getNextAvailableSeats(int numSeats,  Set<Seat> resevedSeats);
+
+     /**
+     *  Returns a list of the next n available seats in the layout using a default row-major ordering starting from a row.
+     * 
+     * @param numSeats the number of available seats to retrieve
+     * @param startingRowIndex the starting row index
+     * @param resevedSeats the set of reserved seats to exclude from the search
+     * @return a list of seats representing the next available seats. If fewer than n seats are available, returns all available seats.
+     */
+    abstract Set<Seat> getNextAvailableSeats(int numSeats, int startingRowIndex, Set<Seat> resevedSeats);
 
     /**
-     * Returns a list of the next n available seat identifiers starting from a given seat.
+     * Returns a list of the next n available seats starting from a given seat.
      *
-     * @param startSeat the seat from which to begin the search (e.g., "B3")
-     * @param n         the number of available seats to retrieve
+     * @param numSeats the number of available seats to retrieve
+     * @param startingSeat the seat  from which to begin the search
+     * @param resevedSeats the set of reserved seats to exclude from the search
      * @return a list of seat identifiers representing the next available seats starting from the given seat.
      *         If fewer than n seats are available after the specified start, returns all available seats found.
      */
-    abstract Set<Seat> getNextAvailableSeats(String seatId, int n);
+    abstract Set<Seat> getNextAvailableSeats(int numSeats, Seat startingSeat, Set<Seat> resevedSeats);
 
-    /**
-     * Reserves the specified seats if it is available.
-     *
-     * @param seatIds the seat identifiers (e.g., "A1")
-     * @return true if the seat was successfully reserved; false if it was already reserved or invalid.
-     */
-    boolean reserveSeat(Seat seat) {
-        //check if the seat is already reserved
-        if (seatAvailability.get(seat)) {
-            return false;
-        }
-        seatAvailability.put(seat, true);             
-        return true;
-    }
 }

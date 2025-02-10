@@ -1,5 +1,6 @@
 package com.gic.cinema.model;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,7 +21,8 @@ import lombok.ToString;
 @ToString
 public class Showtime {
     private final String movieName;
-    private final ScreenLayout screenLayout;
+    private final Screen screen;
+    private final Map<Seat,Boolean> seatAvailability; 
 
     /**
      * Constructs a new Showtime instance.
@@ -28,9 +30,10 @@ public class Showtime {
      * @param movieName the name of the movie
      * @param screen    the screen for the showtime
      */
-    public Showtime(String movieName, ScreenLayout screenLayout) {
+    public Showtime(String movieName, Screen screen) {
         this.movieName = movieName;
-        this.screenLayout = screenLayout;
+        this.screen = screen;
+        this.seatAvailability = screen.initializeSeats().stream().collect(Collectors.toMap(e -> e, e -> false));
     }
 
     /**
@@ -39,29 +42,39 @@ public class Showtime {
      * @return the number of remaining unreserved seats
      */
     public long getAvailableSeatCount() {
-        return screenLayout.getSeatAvailability()
-            .values().stream().filter(isReserved -> !isReserved).count();
+        return seatAvailability.values().stream().filter(isReserved -> !isReserved).count();
     }
 
-    /**
-     * Gets the available seat count for this showtime.
-     * 
-     * @return next n available seats
+     /**
+     * Returns the next n available seats starting from the furthest row from the screen and middle-most possible seat within in the row. All seats in a row has been exhausted
+     * it will overflow to next row.
+     * @param numSeats the number of available seats to retrieve
+     * @param startingRowIndex the starting row index
+     * @return the next available set of seats
      */
-    public Set<Seat> getAvailableSeats(int n) {
-        return screenLayout.getNextAvailableSeats(n);
+    public Set<Seat> getNextAvailableSeats(int numSeats) {
+        return screen.getScreenLayout().getNextAvailableSeats(numSeats, getReservedSeats());
     }
 
-    public Set<Seat> getAvailableSeats(String seatId, int n)  {
-        return screenLayout.getNextAvailableSeats(seatId, n);
-    }
+     /**
+     * Seats are filled up starting from the given seats. Seats from the same row all the way to the right are filled up first and the overflows to the next row. 
+     * 
+     * @param startSeatId the seat identifier from which to start (e.g., "B3")
+     * @param numSeats the number of available seats to retrieve
+     * @return the next available set of seats
+     * @throws IllegalArgumentException if the provided startSeat is invalid.
+     */
+    public Set<Seat> getNextAvailableSeats(int numSeats, String startSeatId) {
+        Seat startingSeat = getScreen().parseSeatId(startSeatId);
+        return screen.getScreenLayout().getNextAvailableSeats(numSeats, startingSeat, getReservedSeats());
+    }  
 
     /**
      * Get the set of reserved seat identifiers for this showtime.
      * @return
      */
     public Set<Seat> getReservedSeats() {
-        return  screenLayout.getSeatAvailability()
+        return  seatAvailability
             .entrySet().stream()
             .filter(entry -> entry.getValue())
             .map(entry -> entry.getKey())
@@ -71,13 +84,26 @@ public class Showtime {
     /**
      * Mark the specified seat identifiers as reserved.
      * @param selectedSeats set of selected seat identifiers for booking
-     * @return the set of reserved seats
-     * @throws IllegalArgumentException if any of the seat identifiers are invalid
+     * @return true if all seats were reserved. False otherwise
+     * @throws IlleagalStateException if any of the seats are already reserved
      */
-    Set<Seat> reserveSeats(Set<Seat> selectedSeats) {
-        selectedSeats.forEach(seat -> {
-            screenLayout.reserveSeat(seat);
-        });
-        return getReservedSeats();
+    boolean reserveSeats(Set<Seat> selectedSeats) {
+        return selectedSeats.stream().map(seat -> reserveSeat(seat)).allMatch(successs -> successs);
+    }
+
+    /**
+     * Reserves the specified seats if it is available.
+     *
+     * @param seat the seat that needs to reserved
+     * @return true if the seat was successfully reserved; false if it was already reserved or invalid.
+     * @throws IlleagalStateException if any of the seats are already reserved
+     */
+    boolean reserveSeat(Seat seat) {
+        //check if the seat is already reserved
+        if (seatAvailability.get(seat)) {
+            throw new IllegalStateException("Cannot reserve an already reserved Seat");
+        }
+        seatAvailability.put(seat, true);             
+        return true;
     }
 }

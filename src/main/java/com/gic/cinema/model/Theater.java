@@ -31,13 +31,14 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class Theater {
+    private final static String TICKET_PREFIX = "GIC"; 
     private final Screen screen;
     private final Showtime showtime;
     private final Map<String, Ticket> tickets;
 
-    public Theater(@NonNull String movieName, int rows, int seatsPerRow) {
-        this.screen = new DefaultScreen(rows, seatsPerRow);
-        this.showtime = new Showtime(movieName, new DefaultScreenLayout(screen));
+    public Theater(@NonNull String movieName, int totalRows, int seatsPerRow) {
+        this.screen = new DefaultScreen(totalRows, seatsPerRow);
+        this.showtime = new Showtime(movieName, screen);
         this.tickets = new HashMap<>();
     }
     
@@ -58,6 +59,33 @@ public class Theater {
     }
 
     /**
+     * Retrieves a booked ticket by its ticket ID.
+     * <p>
+     * Note: This implementation uses {@code Optional.of} on the value found in the tickets map.
+     * </p>
+     *
+     * @param ticketId the identifier of the ticket
+     * @return an Optional containing the Ticket if found, otherwise an empty Optional
+     */
+    public Ticket generateTicket(Set<Seat> selectedSeats) {
+        return new Ticket(generateTicketID(), showtime, selectedSeats);
+    }
+
+     /**
+     * Retrieves a booked ticket by its ticket ID.
+     * <p>
+     * Note: This implementation uses {@code Optional.of} on the value found in the tickets map.
+     * </p>
+     *
+     * @param ticketId the identifier of the ticket
+     * @return an Optional containing the Ticket if found, otherwise an empty Optional
+     */
+    public void confirmTicket(Ticket ticket) {
+        ticket.confirmBooking();
+        tickets.put(ticket.getTicketId(), ticket);
+    }
+
+    /**
      * Generates a new ticket ID.
      * <p>
      * A new Ticket is created using the current showtime, the selected seats,
@@ -69,24 +97,11 @@ public class Theater {
      * @param selectedSeats a set of seat identifiers (e.g., "A1", "B12") to be booked
      * @return the newly generated Ticket 
      */
-    public String generateTicketID() {
-        return Ticket.generateTicketID(tickets.size() + 1);
-    }
-
-
-    /**
-     * Generates a new ticket with selected seats.
-     * <p>
-     * Given ticketId is confirm for the showtime and the selected seats.
-     * The ticket is then stored in the theater’s tickets map
-     * </p>
-     *
-     * @param selectedSeats a set of seat identifiers (e.g., "A1", "B12") to be booked
-     * @return the newly generated Ticket 
-     */
-    public void confirmBooking(String ticketID, Set<Seat> selectedSeats) {
-        Set<Seat> reservedSeats = this.showtime.reserveSeats(selectedSeats);
-        Ticket ticket = new Ticket(ticketID, this.showtime, reservedSeats);
-        tickets.put(ticket.getTicketId(), ticket);
+    String generateTicketID() {
+        int ticketCounter = tickets.size() + 1;
+        if (ticketCounter > 9999) {
+            throw new IllegalStateException("Ticket counter is not expected to be more than 4 digits!!!");
+        }
+        return String.format("%s%04d", TICKET_PREFIX, ticketCounter);
     }
 }
